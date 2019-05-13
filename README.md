@@ -2,8 +2,6 @@
 
 You can find ARCSim here: http://graphics.berkeley.edu/resources/ARCSim/
 
-I have ARCSim version 0.3.1 working on Ubuntu 16.04.
-
 
 ## ARCSim 0.3.1 on Ubuntu 16.04
 
