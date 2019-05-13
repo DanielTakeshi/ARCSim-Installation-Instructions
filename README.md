@@ -2,13 +2,16 @@
 
 You can find ARCSim here: http://graphics.berkeley.edu/resources/ARCSim/
 
-Right now I'm using **version 0.3.1**, even though we don't need fractures.
+I have ARCSim version 0.3.1 working on Ubuntu 16.04.
 
-ARCSim is tricky to install. Here are the steps I followed. First, unzip the
-`tar.gz` file somewhere and read the INSTALL file. You'll see that they tell
-you to install some libraries, but it's not clear what the precise commands
-should be (and there are some missing instructions). Here's what I did to get
-this working on an Ubuntu 16.04 system:
+
+## ARCSim 0.3.1 on Ubuntu 16.04
+
+Here are the steps I followed for version 0.3.1 (with the fractures) on an
+Ubuntu 16.04 system. First, unzip the `tar.gz` file somewhere and read the
+INSTALL file. You'll see that they tell you to install some libraries, but it's
+not clear what the precise commands should be (and there are some missing
+instructions). Here's what I did:
 
 - Rename `Makefile.linux` to `Makefile` if using Ubuntu/Linux, because it seems
   like OS X is the default. Of course, if you're on OS X then you're probably
@@ -41,8 +44,8 @@ this working on an Ubuntu 16.04 system:
   make: *** [lib/libtaucs.a] Error 1
   ```
 
-  But anyway, running `make` works Ideally you should see this after doing
-  `make` a second time:
+  But anyway, hopefully running `make` works. Ideally you should see this after
+  doing `make` a second time:
 
   ```
   daniel@takeshi:~/arcsim-0.3.1/dependencies $ make
@@ -50,7 +53,7 @@ this working on an Ubuntu 16.04 system:
   daniel@takeshi:~/arcsim-0.3.1/dependencies $
   ```
 
-- Now go back into the top-level directory `arcsim-0.3.1/` and type `make.` If
+- Now go back into the top-level directory `arcsim-0.3.1/` and type `make`. If
   it runs without errors, that's a good sign! Immediately running `make` a
   second time gives me this:
 
@@ -73,10 +76,11 @@ I see this so hopefully things are OK:
 
 ![](arcsim_first_try.png)
 
-though the physics can seem a bit weird.
+I am not yet sure about the details of this setup, but that should be a matter
+of reading their code.
 
 
-Note: after doing `make` in the `dependencies/` directory, but before doing
+Note: after doing `make` in the `dependencies/` directory, but *before* doing
 `make` for the `arcsim-0.3.1` directory, you might need to make the following
 fixes if they are resulting in compilation errors:
 
@@ -90,3 +94,61 @@ fixes if they are resulting in compilation errors:
   ```
 
 But I did not need to do those and it seems like things are working on my end.
+To test, we can read through the code and run commands, while running `make`
+each time to compile. We shouldn't have to re-compile the dependencies, though.
+
+
+
+## ARCSim 0.2.1 on Ubuntu 16.04
+
+
+- You do not need to rename the Makefile (as in 0.3.1) because there is only
+  one Makefile.
+
+- Install the same packages as for 0.3.1 using the same `sudo apt-get install [...]` command.
+
+- Go to `dependencies` and run `make`. I did *not* have to delete the
+  `dependencies/taucs/build/darwin/` directory. (In fact, it doesn't seem to
+  exist in this version, I see "linux" instead of "darwin" at the end.)
+
+- Go back to top level directory `arcsim-0.2.1`, and run `make` but you'll get
+  this error:
+
+  ```
+  g++ build/release/auglag.o build/release/bah.o build/release/bvh.o build/release/cloth.o build/release/collision.o build/release/collisionutil.o build/release/conf.o build/release/constraint.o build/release/dde.o build/release/display.o build/release/displayphysics.o build/release/displayreplay.o build/release/displaytesting.o build/release/dynamicremesh.o build/release/geometry.o build/release/handle.o build/release/io.o build/release/lbfgs.o build/release/lsnewton.o build/release/magic.o build/release/main.o build/release/mesh.o build/release/misc.o build/release/morph.o build/release/mot_parser.o build/release/nearobs.o build/release/nlcg.o build/release/obstacle.o build/release/physics.o build/release/popfilter.o build/release/plasticity.o build/release/proximity.o build/release/remesh.o build/release/runphysics.o build/release/separate.o build/release/separateobs.o build/release/simulation.o build/release/spline.o build/release/strainlimiting.o build/release/taucs.o build/release/tensormax.o build/release/timer.o build/release/transformation.o build/release/trustregion.o build/release/util.o build/release/vectors.o -o bin/arcsim -Ldependencies/lib -L/opt/local/lib -lpng -lz -ltaucs -llapack -lblas -lboost_filesystem-mt -lboost_system-mt -lboost_thread-mt -ljson -lgomp -lalglib -lglut -lGLU -lGL
+  /usr/bin/ld: cannot find -lboost_filesystem-mt
+  /usr/bin/ld: cannot find -lboost_system-mt
+  /usr/bin/ld: cannot find -lboost_thread-mt
+  collect2: error: ld returned 1 exit status
+  Makefile:80: recipe for target 'bin/arcsim' failed
+  make: *** [bin/arcsim] Error 1
+  ```
+
+  The reason is that the Makefile is relying on the boost "mt" (multithreaded)
+  libraries, but [that is now deprecated (source)][1]. So, in the Makefile, change this line:
+
+  ```
+  LDFLAGS := -Ldependencies/lib -L/opt/local/lib -lpng -lz -ltaucs -llapack -lblas -lboost_filesystem-mt -lboost_system-mt -lboost_thread-mt -ljson -lgomp -lalglib
+  ```
+
+  to
+
+  ```
+  LDFLAGS := -Ldependencies/lib -L/opt/local/lib -lpng -lz -ltaucs -llapack -lblas -lboost_filesystem -lboost_system -lboost_thread -ljson -lgomp -lalglib
+  ```
+
+  I.e., just remove "-mt" from the three boost-related stuff. Then type `make`
+  again. And hopefully things work.
+
+
+Now to test:
+
+![](arcsim_first_try_0.2.1.png)
+
+Hopefully that means the code is working. It seems like the GUI is a bit
+different but that should be a minor detail.
+
+
+
+
+[1]:https://askubuntu.com/questions/486006/cannot-find-boost-thread-mt-library
