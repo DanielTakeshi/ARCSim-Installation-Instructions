@@ -2,6 +2,11 @@
 PYTHON 3.X VERSION
 Modified for compatibility with the new version of Python
 
+Changelog:
+- Modified syntax of print functions
+- Import of "apply" library for compatibility
+- Name of "commands" change to "subprocess"
+
 Notes: 
 - shared library support is buggy: it assumes that a static and dynamic library can be build from the same object files. This is not true on many platforms. For this reason it is only enabled on linux-gcc at the current time.
 
