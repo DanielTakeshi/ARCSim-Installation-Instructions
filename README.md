@@ -28,6 +28,8 @@ instructions). Here's what I did:
 
 - Delete a directory: `rm -r dependencies/taucs/build/darwin/`.
 
+- If you are running Python 3, [follow these instructions](installation-with-python-3.x).
+
 - Change directory into `dependencies/` and run `make`. If you didn't delete
   the directory in the previous step, you'll get this error at the end of a
   LONG print out:
@@ -95,6 +97,21 @@ But I did not need to do those and it seems like things are working on my end.
 To test, we can read through the code and run commands, while running `make`
 each time to compile. We shouldn't have to re-compile the dependencies, though.
 
+### Installation with Python 3.x
+If your machine does not have Python 2.x installed (e.g. Ubuntu 20.04 by default), you may run into this issue:
+
+```
+scons: Reading SConscript files ...
+  File "/home/fedebotu/Downloads/add0n.com/arcsim-0.3.1/dependencies/jsoncpp/SConstruct", line 31
+    print "Using platform '%s'" %platform
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print("Using platform '%s'" %platform)?
+make: *** [Makefile:12: lib/libjson.a] Error 2
+```
+This is caused by the old syntax and deprecated functions in Python 2. In particular, you can fix the error by modifying the code in the `SConstruct` file to work with the newer version. 
+1. Install `apply` ( i.e., with `pip install apply` )
+2. Download the modified [SConstruct](SConstruct) file from this repository and replace the old one in `dependencies/jsoncpp/SCOnstruct`
+
 
 
 ## ARCSim 0.2.1 on Ubuntu 16.04
@@ -150,3 +167,4 @@ different but that should be a minor detail.
 
 
 [1]:https://askubuntu.com/questions/486006/cannot-find-boost-thread-mt-library
+
